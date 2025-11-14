@@ -68,7 +68,7 @@ The key parameters for running ZAP in daemon mode are:
 
 ### Running the Scanner
 
-Scan with the default target URL (from .env file):
+Scan with the default target URL (from environment file):
 ```bash
 python zap_scanner.py
 ```
@@ -82,6 +82,11 @@ or using the short option:
 ```bash
 python zap_scanner.py -t https://example.com
 ```
+
+Additional options:
+
+- `--verbose` (`-v`): enable debug logging in the console and log file.
+- `--keep-zap`: skip the shutdown request at the end of the run if you want to keep the ZAP daemon alive for manual review.
 
 ## Output
 
@@ -106,3 +111,18 @@ qa-security-scanner/
 - The ZAP API Key in the .env file should be kept secure and not committed to public repositories
 - Only scan websites that you have permission to test
 - Review the generated reports for false positives before acting on the results
+- The scanner processes a single target per run; execute multiple runs if you need to cover more than one host
+
+## Authenticated Scans
+
+To include authenticated CMS areas in the scan, configure these environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `LOGIN_URL` | Absolute URL of the form endpoint that processes the login. When set, authentication is enabled. |
+| `LOGIN_USERNAME` / `LOGIN_PASSWORD` | Credentials for the scanner user (required when `LOGIN_URL` is set). |
+| `LOGIN_USERNAME_FIELD` / `LOGIN_PASSWORD_FIELD` | Form field names (default: `username` / `password`). |
+| `LOGIN_EXTRA_PARAMS` | Optional additional form parameters, formatted as `key=value&foo=bar`. |
+| `LOGIN_LOGGED_IN_REGEX` / `LOGIN_LOGGED_OUT_REGEX` | Optional regular expressions to help ZAP detect session state. |
+
+The tool configures a ZAP context with form-based authentication, runs the spider and active scan as the authenticated user, and still supports unauthenticated scans when `LOGIN_URL` is omitted.
